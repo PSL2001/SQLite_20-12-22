@@ -60,10 +60,56 @@ class BaseDatos(c: Context): SQLiteOpenHelper(c, DATABASE, null, VERSION) {
                 val user = User(id, email, password, perfil)
                 lista.add(user)
             } while (cursor.moveToNext())
+            cursor.close()
         }
         //Cerrar la base de datos
         db.close()
         //Retornar el ArrayList
         return lista
+    }
+
+    fun existeUsuario(email: String, password: String = ""): Boolean {
+        //Abrimos la base de datos en modo lectura
+        val db = this.readableDatabase
+        //Creamos una variable que contará el número de usuarios que coinciden con el email y password del usuario que pasamos por parámetro
+        var count = 0
+        //Creamos un objeto de tipo Cursor para almacenar los datos leidos
+        //Si el password es vacío, solo comprobamos que exista el email
+        //Si el password no es vacío, comprobamos que exista el email y que el password coincida
+        val cursor = if (password == "") {
+            db.rawQuery("SELECT * FROM $TABLE WHERE email = '$email'", null)
+        } else {
+            db.rawQuery("SELECT * FROM $TABLE WHERE email = '$email' AND password = '$password'", null)
+        }
+        //Contamos el numero de filas que devuelve el cursor
+        count = cursor.count
+        //Cerramos el cursor
+        cursor.close()
+        //Cerramos la base de datos
+        db.close()
+        //Si count es 0, no existe el usuario
+        //Si count es 1, existe el usuario
+        return count == 1
+
+    }
+
+    fun getPerfil(email: String, password: String): Int {
+        //Abrimos la base de datos en modo lectura
+        val db = this.readableDatabase
+        //Creamos una variable que almacenará el perfil del usuario
+        var perfil = 0
+        //Creamos un objeto de tipo Cursor para almacenar los datos leidos
+        val cursor = db.rawQuery("SELECT perfil FROM $TABLE WHERE email = '$email' AND password = '$password'", null)
+        //Recorremos el cursor y almacenamos el perfil del usuario en la variable perfil
+        if (cursor.moveToFirst()) {
+            do {
+                perfil = cursor.getInt(0)
+            } while (cursor.moveToNext())
+            cursor.close()
+        }
+        //Cerramos la base de datos
+        db.close()
+        //Retornamos el perfil del usuario
+        return perfil
     }
 }
