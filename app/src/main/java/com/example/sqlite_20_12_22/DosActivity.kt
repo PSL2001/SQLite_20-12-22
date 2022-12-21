@@ -1,5 +1,6 @@
 package com.example.sqlite_20_12_22
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,8 +26,6 @@ class DosActivity : AppCompatActivity() {
         bd = BaseDatos(this)
         //Seteamos el recycler view
         setRecyclerView()
-        //Seteamos listeners
-        setListeners()
         //Recogemos el email y el perfil del usuario que ha iniciado sesion
         recogerDatos()
 
@@ -38,16 +37,23 @@ class DosActivity : AppCompatActivity() {
         binding.tvEmailRe.text = emailRe
     }
 
-    private fun setListeners() {
-
-    }
-
     private fun setRecyclerView() {
         //Obtenemos la lista de usuarios
         lista = bd.leer()
         //Creamos el adapter
         binding.recUsers.layoutManager = LinearLayoutManager(this)
-        adapter = UsuariosAdapter(lista)
+        adapter = UsuariosAdapter(lista) { onItemEdit(it) }
         binding.recUsers.adapter = adapter
+    }
+
+    private fun onItemEdit(it: User) {
+        //Mandamos a la actividad tres el usuario que queremos editar
+        val intent = Intent(this, TresActivity::class.java)
+        intent.putExtra("ID", it.id)
+        intent.putExtra("EMAIL", it.email)
+        intent.putExtra("PASSWORD", it.password)
+        intent.putExtra("PERFIL", it.perfil)
+        startActivity(intent)
+
     }
 }

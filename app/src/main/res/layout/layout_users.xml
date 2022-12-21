@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="TextView"
-            android:textColor="#2196F3"
+            android:textColor="#1565C0"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="TextView"
-            android:textColor="#4CAF50"
+            android:textColor="#33691E"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.243"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"
-            android:textColor="#FFC107"
+            android:textColor="#B71C1C"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/tvPassword"
@@ -58,17 +58,19 @@
             app:layout_constraintVertical_bias="1.0" />
 
         <Button
-            android:id="@+id/btnBorrarR"
+            android:id="@+id/btnEditar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:backgroundTint="#F30B0B"
-            android:text="borrar"
-            app:icon="@android:drawable/ic_menu_delete"
+            android:backgroundTint="#FFC107"
+            android:text="Editar"
+            android:textColor="#6D4C41"
+            app:icon="@android:drawable/ic_menu_edit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPassword" />
+            app:layout_constraintTop_toBottomOf="@+id/tvPassword"
+            tools:ignore="TextContrastCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

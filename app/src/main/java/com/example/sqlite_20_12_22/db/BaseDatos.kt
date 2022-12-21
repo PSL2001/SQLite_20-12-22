@@ -112,4 +112,22 @@ class BaseDatos(c: Context): SQLiteOpenHelper(c, DATABASE, null, VERSION) {
         //Retornamos el perfil del usuario
         return perfil
     }
+
+    fun editar(user: User): Int {
+        //Abrimos la base de datos en modo escritura
+        val db = this.writableDatabase
+        //Creamos un objeto de tipo ContentValues para almacenar los datos a actualizar
+        val valores = ContentValues().apply {
+            put("email", user.email)
+            put("password", user.password)
+            put("perfil", user.perfil)
+        }
+        //Actualizamos los datos en la tabla
+        val res = db.update(TABLE, valores, "id = ?", arrayOf(user.id.toString()))
+        //Cerramos la base de datos
+        db.close()
+        //Retornamos el resultado
+        //Si res es -1, hubo un error
+        return res
+    }
 }
