@@ -68,18 +68,18 @@ class BaseDatos(c: Context): SQLiteOpenHelper(c, DATABASE, null, VERSION) {
         return lista
     }
 
-    fun existeUsuario(email: String, password: String = ""): Boolean {
+    fun existeUsuario(email: String, id: Int = 0): Boolean {
         //Abrimos la base de datos en modo lectura
         val db = this.readableDatabase
         //Creamos una variable que contará el número de usuarios que coinciden con el email y password del usuario que pasamos por parámetro
         var count = 0
         //Creamos un objeto de tipo Cursor para almacenar los datos leidos
-        //Si el password es vacío, solo comprobamos que exista el email
-        //Si el password no es vacío, comprobamos que exista el email y que el password coincida
-        val cursor = if (password == "") {
+        //Si el id es 0, significa que estamos registrando un nuevo usuario
+        //Si el id es mayor que 0, significa que estamos actualizando un usuario
+        val cursor = if (id == 0) {
             db.rawQuery("SELECT * FROM $TABLE WHERE email = '$email'", null)
         } else {
-            db.rawQuery("SELECT * FROM $TABLE WHERE email = '$email' AND password = '$password'", null)
+            db.rawQuery("SELECT * FROM $TABLE WHERE email = '$email' AND id != $id", null)
         }
         //Contamos el numero de filas que devuelve el cursor
         count = cursor.count
@@ -91,6 +91,25 @@ class BaseDatos(c: Context): SQLiteOpenHelper(c, DATABASE, null, VERSION) {
         //Si count es 1, existe el usuario
         return count == 1
 
+    }
+
+    //Login
+    fun login(email: String, password: String): Boolean {
+        //Abrimos la base de datos en modo lectura
+        val db = this.readableDatabase
+        //Creamos una variable que contará el número de usuarios que coinciden con el email y password del usuario que pasamos por parámetro
+        var count = 0
+        //Creamos un objeto de tipo Cursor para almacenar los datos leidos
+        val cursor = db.rawQuery("SELECT * FROM $TABLE WHERE email = '$email' AND password = '$password'", null)
+        //Contamos el numero de filas que devuelve el cursor
+        count = cursor.count
+        //Cerramos el cursor
+        cursor.close()
+        //Cerramos la base de datos
+        db.close()
+        //Si count es 0, no existe el usuario
+        //Si count es 1, existe el usuario
+        return count == 1
     }
 
     fun getPerfil(email: String, password: String): Int {

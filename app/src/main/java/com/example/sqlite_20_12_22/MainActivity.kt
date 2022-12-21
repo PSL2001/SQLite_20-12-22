@@ -7,10 +7,12 @@ import androidx.appcompat.app.AlertDialog
 import com.example.sqlite_20_12_22.databinding.ActivityMainBinding
 import com.example.sqlite_20_12_22.db.BaseDatos
 import com.example.sqlite_20_12_22.models.User
+import com.example.sqlite_20_12_22.prefs.Prefs
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var db: BaseDatos
+    lateinit var prefs: Prefs
     var email = ""
     var password = ""
     var perfil = 0
@@ -20,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         db = BaseDatos(this)
+        prefs = Prefs(this)
         //Creamos una funcion que comprueba si el usuario admin existe y si no existe lo crea
         comprobarAdmin()
         //Seteamos listeners
@@ -55,6 +58,10 @@ class MainActivity : AppCompatActivity() {
         val user = User(0, email, password , 0)
         //Insertamos el usuario en la base de datos
         db.insertar(user)
+        //Guardamos el usuario en las preferencias
+        prefs.saveEmail(email)
+        prefs.savePassword(password)
+        prefs.savePerfil(perfil)
         //Una vez registrado lo mandamos a la actividad dos
         val intent = Intent(this, DosActivity::class.java)
         intent.putExtra("EMAIL", email)
@@ -79,17 +86,26 @@ class MainActivity : AppCompatActivity() {
             return
         }
         //Comprobamos que el usuario exista
-        if (!db.existeUsuario(email, password)) {
+        if (!db.existeUsuario(email)) {
             mostrarError("El usuario no existe")
         } else {
-            //Obtenemos el perfil del usuario
-            perfil = db.getPerfil(email, password)
-            //Mandamos los datos a la siguiente actividad
-            val intent = Intent(this, DosActivity::class.java)
-            intent.putExtra("EMAIL", email)
-            intent.putExtra("PASSWORD", password)
-            intent.putExtra("PERFIL", perfil)
-            startActivity(intent)
+            //Comprobamos que la contraseña sea correcta
+            if (db.login(email, password)) {
+                //Obtenemos el perfil del usuario
+                perfil = db.getPerfil(email, password)
+                //Guardamos el usuario en las preferencias
+                prefs.saveEmail(email)
+                prefs.savePassword(password)
+                prefs.savePerfil(perfil)
+                //Mandamos a la actividad dos
+                val intent = Intent(this, DosActivity::class.java)
+                intent.putExtra("EMAIL", email)
+                intent.putExtra("PASSWORD", password)
+                intent.putExtra("PERFIL", perfil)
+                startActivity(intent)
+            } else {
+                mostrarError("La contraseña es incorrecta")
+            }
         }
     }
 
@@ -106,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         //Creamos un objeto usuario con los siguientes datos: admin, admin@gmail.com, secret0, perfil 1 (admin)
         val admin = User(0, "admin@gmail.com", "secret0", 1)
         //Comprobamos si el usuario admin existe
-        if (!db.existeUsuario(admin.email, admin.password)) {
+        if (!db.existeUsuario(admin.email)) {
             //Si no existe, lo creamos
             db.insertar(admin)
         }
